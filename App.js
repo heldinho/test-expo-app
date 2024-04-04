@@ -1,20 +1,27 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import * as React from "react";
+import * as RN from "react-native";
+import { RecoilRoot } from "recoil";
+import Counter from "./src/components/Counter";
+import Animation from "./src/components/Animation";
+import Title from "./src/components/Title";
 
 export default function App() {
+  //   const [count, setCount] = useRecoilState(counterAtom);
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <RN.SafeAreaView style={{ flex: 1, paddingTop: 40 }}>
+      <Title text="Application Expo" />
+      <RN.View
+        style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+      >
+        <RecoilRoot>
+          <Counter />
+        </RecoilRoot>
+      </RN.View>
+      <RN.View
+        style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+      >
+        <Animation />
+      </RN.View>
+    </RN.SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

@@ -4,9 +4,12 @@ import { RecoilRoot } from "recoil";
 import Counter from "./src/components/Counter";
 import Animation from "./src/components/Animation";
 import Title from "./src/components/Title";
+import BoardScreen from "./src/App/Kanban/screens/board.screen";
 
 export default function App() {
   //   const [count, setCount] = useRecoilState(counterAtom);
+  return <BoardScreen />;
+
   return (
     <RN.SafeAreaView style={{ flex: 1, paddingTop: 40 }}>
       <Title text="Application Expo" />

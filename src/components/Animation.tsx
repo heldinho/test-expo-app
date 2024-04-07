@@ -1,10 +1,11 @@
+import * as React from "react";
+import * as RN from "react-native";
 import Animated, {
   useSharedValue,
   withTiming,
   useAnimatedStyle,
   Easing,
 } from "react-native-reanimated";
-import { View, Button, StyleSheet } from "react-native";
 
 export default function Animation() {
   const randomWidth = useSharedValue(10);
@@ -21,19 +22,19 @@ export default function Animation() {
   });
 
   return (
-    <View style={styles.container}>
+    <RN.View style={styles.container}>
       <Animated.View style={[styles.box, style]} />
-      <Button
+      <RN.Button
         title="toggle"
         onPress={() => {
           randomWidth.value = Math.random() * 350;
         }}
       />
-    </View>
+    </RN.View>
   );
 }
 
-const styles = StyleSheet.create({
+const styles = RN.StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",

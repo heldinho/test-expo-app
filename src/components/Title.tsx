@@ -1,16 +1,16 @@
-import * as React from "react";
-import * as RN from "react-native";
+import * as React from 'react';
+import * as RN from 'react-native';
 
 export default function Title(props) {
   return (
     <RN.Text
       style={{
         fontSize: 20,
-        fontWeight: "700",
-        textAlign: "center",
+        fontWeight: '700',
+        textAlign: 'center',
       }}
     >
-      {props.text || ""}
+      {props.text || ''}
     </RN.Text>
   );
 }

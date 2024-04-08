@@ -1,11 +1,11 @@
-import * as React from "react";
-import * as RN from "react-native";
+import * as React from 'react';
+import * as RN from 'react-native';
 import Animated, {
   useSharedValue,
   withTiming,
   useAnimatedStyle,
   Easing,
-} from "react-native-reanimated";
+} from 'react-native-reanimated';
 
 export default function Animation() {
   const randomWidth = useSharedValue(10);
@@ -37,13 +37,13 @@ export default function Animation() {
 const styles = RN.StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   box: {
     width: 100,
     height: 80,
-    backgroundColor: "black",
+    backgroundColor: 'black',
     margin: 30,
   },
 });

@@ -1,5 +1,5 @@
-import * as React from "react";
-import * as RN from "react-native";
+import * as React from 'react';
+import * as RN from 'react-native';
 
 type Props = {
   title: string;
@@ -13,10 +13,12 @@ export default function Header(props: Props): JSX.Element {
       <RN.Text>{props.title || ''}</RN.Text>
       <RN.View style={styles.boxCountBacklog}>
         <RN.View style={styles.boxProgress}></RN.View>
-        <RN.Text
-          allowFontScaling={false}
-          style={styles.fontCountBacklog}
-        >{`${props.count || 0}/${props.length || 0} Done`}</RN.Text>
+        <RN.Text allowFontScaling={false} style={styles.fontCountBacklog}>
+          <RN.Text allowFontScaling={false} style={{ fontWeight: '400' }}>{`${
+            props.count || 0
+          }/${props.length || 0}`}</RN.Text>
+          {`  Done`}
+        </RN.Text>
       </RN.View>
     </RN.View>
   );
@@ -24,29 +26,30 @@ export default function Header(props: Props): JSX.Element {
 
 const styles = RN.StyleSheet.create({
   header: {
-    backgroundColor: "#f4f4f4",
+    backgroundColor: '#f4f4f4',
     padding: 20,
     margin: 20,
     borderRadius: 8,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   boxCountBacklog: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     borderRadius: 100,
     padding: 10,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 10,
   },
   boxProgress: {
-    backgroundColor: "#ccc",
+    backgroundColor: '#ccc',
     padding: 10,
     borderRadius: 100,
   },
   fontCountBacklog: {
     fontSize: 10,
-    color: "#444",
+    color: '#444',
+    fontWeight: '700',
   },
 });

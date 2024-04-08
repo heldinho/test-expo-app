@@ -7,13 +7,7 @@ import Icons from '../../../components/Icons';
 import { useRecoilState } from 'recoil';
 import { doneAtom, progressAtom, todoAtom } from '../../../atoms/Kanban';
 import uuid from 'react-native-uuid';
-
-export interface Item {
-  id: string;
-  priority: 'low' | 'medium' | 'high';
-  title: string;
-  list: 'todo' | 'progress' | 'done';
-}
+import { Item } from '../../../types';
 
 const colorPriority = {
   low: '#e1fbd6',

@@ -5,13 +5,17 @@ type Props = {
   title: string;
   count: number;
   length: number;
+  onPress?: () => void;
 };
 
 export default function Header(props: Props): JSX.Element {
   return (
     <RN.View style={styles.header}>
       <RN.Text>{props.title || ''}</RN.Text>
-      <RN.View style={styles.boxCountBacklog}>
+      <RN.TouchableOpacity
+        onPress={() => props.onPress()}
+        style={styles.boxCountBacklog}
+      >
         <RN.View style={styles.boxProgress}></RN.View>
         <RN.Text allowFontScaling={false} style={styles.fontCountBacklog}>
           <RN.Text allowFontScaling={false} style={{ fontWeight: '400' }}>{`${
@@ -19,7 +23,7 @@ export default function Header(props: Props): JSX.Element {
           }/${props.length || 0}`}</RN.Text>
           {`  Done`}
         </RN.Text>
-      </RN.View>
+      </RN.TouchableOpacity>
     </RN.View>
   );
 }

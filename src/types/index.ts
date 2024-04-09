@@ -1,6 +1,8 @@
 export interface Item {
   id: string;
-  priority: 'low' | 'medium' | 'high';
+  priority: Priority;
   title: string;
-  list: 'todo' | 'progress' | 'done';
+  list: List;
 }
+export type List = 'todo' | 'progress' | 'done';
+export type Priority = 'low' | 'medium' | 'high';

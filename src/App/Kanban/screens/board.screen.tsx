@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as RN from 'react-native';
+import type { Item, List, Priority } from '../../../types';
 import { read, save } from '../services/storage';
 import ButtonCard from '../components/button-card.component';
 import Header from '../components/header.component';
@@ -7,7 +8,7 @@ import Icons from '../../../components/Icons';
 import { useRecoilState } from 'recoil';
 import { doneAtom, progressAtom, todoAtom } from '../../../atoms/Kanban';
 import uuid from 'react-native-uuid';
-import { Item } from '../../../types';
+import Input from '../components/input.component';
 
 const colorPriority = {
   low: '#e1fbd6',
@@ -15,104 +16,93 @@ const colorPriority = {
   high: '#ffe4e2',
 };
 
-function Input({
-  val,
-  onEndEditing,
-}: {
-  val: string;
-  onEndEditing: (value: string) => string;
-}) {
-  const [value, setValue] = React.useState(val);
-  return (
-    <RN.TextInput
-      allowFontScaling={false}
-      style={{
-        flex: 0.9,
-        fontSize: 12,
-        color: '#444',
-        padding: 0,
-        paddingHorizontal: 5,
-      }}
-      value={value}
-      onChangeText={setValue}
-      onEndEditing={() => onEndEditing(value)}
-    />
-  );
-}
-
 export default function BoardScreen(props) {
-  const [countTodo, setCountTodo] = useRecoilState<any>(todoAtom);
-  const [countProgress, setCountProgress] = useRecoilState<any>(progressAtom);
-  const [countDone, setCountDone] = useRecoilState<any>(doneAtom);
+  const [todo, setTodo] = useRecoilState<any>(todoAtom);
+  const [progress, setProgress] = useRecoilState<any>(progressAtom);
+  const [done, setDone] = useRecoilState<any>(doneAtom);
   const [visible, setVisible] = React.useState(false);
   const [modalTitle, setModalTitle] = React.useState('');
+  const [showSelectPriority, setShowSelectPriority] = React.useState(false);
 
   React.useEffect(() => {
     (async () => {
       const valTodo = await read('todo');
       const valProgress = await read('progress');
       const valDone = await read('done');
-      setCountTodo(valTodo ? JSON.parse(valTodo) : []);
-      setCountProgress(valProgress ? JSON.parse(valProgress) : []);
-      setCountDone(valDone ? JSON.parse(valDone) : []);
+      setTodo(valTodo ? JSON.parse(valTodo) : []);
+      setProgress(valProgress ? JSON.parse(valProgress) : []);
+      setDone(valDone ? JSON.parse(valDone) : []);
     })();
   }, []);
 
+  React.useEffect(() => {
+    setShowSelectPriority(false);
+  }, [visible]);
+
+  const clean = () => {
+    setTodo([]);
+    setProgress([]);
+    setDone([]);
+    save('todo', []);
+    save('progress', []);
+    save('done', []);
+  };
+
   const remove = (item: Item) => {
     if (item.list === 'todo') {
-      const list = countTodo.map(i => i.id !== item.id);
+      const list = todo.filter(i => i.id !== item.id);
       save('todo', list);
-      setCountTodo(list);
+      setTodo(list);
     }
     if (item.list === 'progress') {
-      const list = countProgress.map(i => i.id !== item.id);
+      const list = progress.filter(i => i.id !== item.id);
       save('progress', list);
-      setCountProgress(list);
+      setProgress(list);
     }
     if (item.list === 'done') {
-      const list = countDone.map(i => i.id !== item.id);
+      const list = done.filter(i => i.id !== item.id);
       save('done', list);
-      setCountDone(list);
+      setDone(list);
     }
   };
 
-  const move = (item: Item, list: 'todo' | 'progress' | 'done') => {
+  const move = (item: Item, list: List) => {
     let payload: any = [];
     remove(item);
     if (list === 'todo') {
       payload = [
-        ...countTodo,
+        ...todo,
         {
           ...item,
           list,
         },
       ];
-      setCountTodo(payload);
+      setTodo(payload);
     } else if (list === 'progress') {
       payload = [
-        ...countProgress,
+        ...progress,
         {
           ...item,
           list,
         },
       ];
-      setCountProgress(payload);
+      setProgress(payload);
     } else if (list === 'done') {
       payload = [
-        ...countDone,
+        ...done,
         {
           ...item,
           list,
         },
       ];
-      setCountDone(payload);
+      setDone(payload);
     }
     save(list, payload);
   };
 
   const moveToDone = (item: Item) => {
     const payload: any = [
-      ...countDone,
+      ...done,
       {
         ...item,
         list: 'done',
@@ -120,12 +110,12 @@ export default function BoardScreen(props) {
     ];
     remove(item);
     save('done', payload);
-    setCountDone(payload);
+    setDone(payload);
   };
 
   const newTodo = () => {
     const payload: any = [
-      ...countTodo,
+      ...todo,
       {
         id: uuid.v4(),
         priority: 'high',
@@ -134,39 +124,64 @@ export default function BoardScreen(props) {
       },
     ];
     save('todo', payload);
-    setCountTodo(payload);
+    setTodo(payload);
   };
 
   const editTitle = (item: Item): any => {
     if (item.title.length <= 0) return;
     let payload;
     if (item.list === 'todo') {
-      payload = countTodo.map(i => {
+      payload = todo.map(i => {
         if (i.id === item.id) {
           return item;
         }
         return i;
       });
-      setCountTodo(payload);
+      setTodo(payload);
     }
     if (item.list === 'progress') {
-      payload = countTodo.map(i => {
+      payload = progress.map(i => {
         if (i.id === item.id) {
           return item;
         }
         return i;
       });
-      setCountTodo(payload);
+      setProgress(payload);
     }
     save(item.list, payload);
+  };
+
+  const editPriority = (item: Item, priority: Priority) => {
+    let payload;
+    if (item.list === 'todo') {
+      payload = todo.map(i => {
+        if (i.id === item.id) {
+          return { ...item, priority };
+        }
+        return i;
+      });
+      setTodo(payload);
+    }
+    if (item.list === 'progress') {
+      payload = progress.map(i => {
+        if (i.id === item.id) {
+          return { ...item, priority };
+        }
+        return i;
+      });
+      setProgress(payload);
+    }
+    save(item.list, payload);
+    setShowSelectPriority(false);
   };
 
   return (
     <RN.View style={styles.container}>
       <Header
         title="🤟 Let's kick off the day"
-        count={countDone.length}
-        length={countTodo.length + countProgress.length + countDone.length}
+        count={done.length}
+        length={todo.length + progress.length + done.length}
+        onPress={clean}
       />
 
       <>
@@ -176,7 +191,7 @@ export default function BoardScreen(props) {
             setVisible(true);
           }}
           title="To Do"
-          count={countTodo.length}
+          count={todo.length}
           bgcolor="#f4f4f4"
           badgecolor="#e4e4e4"
           icon={
@@ -194,7 +209,7 @@ export default function BoardScreen(props) {
             setVisible(true);
           }}
           title="In Progress"
-          count={countProgress.length}
+          count={progress.length}
           bgcolor="#ebf7fc"
           badgecolor="#c7e9ff"
           icon={
@@ -212,7 +227,7 @@ export default function BoardScreen(props) {
             setVisible(true);
           }}
           title="Done"
-          count={countDone.length}
+          count={done.length}
           bgcolor="#eefae8"
           badgecolor="#cbf0b9"
           icon={
@@ -252,7 +267,7 @@ export default function BoardScreen(props) {
                   <ButtonCard
                     disabled
                     title={modalTitle}
-                    count={countTodo.length}
+                    count={todo.length}
                     bgcolor="#f4f4f4"
                     badgecolor="#e4e4e4"
                     icon={
@@ -277,7 +292,7 @@ export default function BoardScreen(props) {
                         paddingBottom: 100,
                         gap: 20,
                       }}
-                      data={countTodo}
+                      data={todo}
                       renderItem={({ item }) => (
                         <RN.View
                           style={{
@@ -337,18 +352,67 @@ export default function BoardScreen(props) {
                           >
                             <RN.View
                               style={{
-                                paddingVertical: 5,
-                                paddingHorizontal: 10,
-                                borderRadius: 100,
-                                backgroundColor: colorPriority[item.priority],
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                gap: 5,
                               }}
                             >
-                              <RN.Text
-                                allowFontScaling={false}
-                                style={{ fontSize: 12, color: '#444' }}
+                              <RN.TouchableOpacity
+                                onPress={() =>
+                                  setShowSelectPriority(prev => !prev)
+                                }
+                                style={{
+                                  paddingVertical: 5,
+                                  paddingHorizontal: 10,
+                                  borderRadius: 100,
+                                  backgroundColor: colorPriority[item.priority],
+                                }}
                               >
-                                {item.priority}
-                              </RN.Text>
+                                <RN.Text
+                                  allowFontScaling={false}
+                                  style={{ fontSize: 12, color: '#000' }}
+                                >
+                                  {item.priority}
+                                </RN.Text>
+                              </RN.TouchableOpacity>
+                              <>
+                                {showSelectPriority ? (
+                                  <>
+                                    {['low', 'medium', 'high'].map(
+                                      (p: Priority) => (
+                                        <>
+                                          {p !== item.priority && (
+                                            <RN.TouchableOpacity
+                                              onPress={() =>
+                                                editPriority(item, p)
+                                              }
+                                              style={{
+                                                paddingVertical: 5,
+                                                paddingHorizontal: 10,
+                                                borderRadius: 100,
+                                                backgroundColor:
+                                                  colorPriority[p],
+                                              }}
+                                            >
+                                              <RN.Text
+                                                allowFontScaling={false}
+                                                style={{
+                                                  fontSize: 12,
+                                                  color: '#000',
+                                                }}
+                                              >
+                                                {p}
+                                              </RN.Text>
+                                            </RN.TouchableOpacity>
+                                          )}
+                                        </>
+                                      ),
+                                    )}
+                                  </>
+                                ) : (
+                                  <></>
+                                )}
+                              </>
                             </RN.View>
                             <RN.TouchableOpacity
                               onPress={() => move(item, 'progress')}
@@ -395,7 +459,7 @@ export default function BoardScreen(props) {
                   <ButtonCard
                     disabled
                     title={modalTitle}
-                    count={countProgress.length}
+                    count={progress.length}
                     bgcolor="#ebf7fc"
                     badgecolor="#c7e9ff"
                     icon={
@@ -420,7 +484,7 @@ export default function BoardScreen(props) {
                         paddingBottom: 100,
                         gap: 20,
                       }}
-                      data={countProgress}
+                      data={progress}
                       renderItem={({ item }) => (
                         <RN.View
                           style={{
@@ -480,18 +544,67 @@ export default function BoardScreen(props) {
                           >
                             <RN.View
                               style={{
-                                paddingVertical: 5,
-                                paddingHorizontal: 10,
-                                borderRadius: 100,
-                                backgroundColor: colorPriority[item.priority],
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                gap: 5,
                               }}
                             >
-                              <RN.Text
-                                allowFontScaling={false}
-                                style={{ fontSize: 12, color: '#444' }}
+                              <RN.TouchableOpacity
+                                onPress={() =>
+                                  setShowSelectPriority(prev => !prev)
+                                }
+                                style={{
+                                  paddingVertical: 5,
+                                  paddingHorizontal: 10,
+                                  borderRadius: 100,
+                                  backgroundColor: colorPriority[item.priority],
+                                }}
                               >
-                                {item.priority}
-                              </RN.Text>
+                                <RN.Text
+                                  allowFontScaling={false}
+                                  style={{ fontSize: 12, color: '#000' }}
+                                >
+                                  {item.priority}
+                                </RN.Text>
+                              </RN.TouchableOpacity>
+                              <>
+                                {showSelectPriority ? (
+                                  <>
+                                    {['low', 'medium', 'high'].map(
+                                      (p: Priority) => (
+                                        <>
+                                          {p !== item.priority && (
+                                            <RN.TouchableOpacity
+                                              onPress={() =>
+                                                editPriority(item, p)
+                                              }
+                                              style={{
+                                                paddingVertical: 5,
+                                                paddingHorizontal: 10,
+                                                borderRadius: 100,
+                                                backgroundColor:
+                                                  colorPriority[p],
+                                              }}
+                                            >
+                                              <RN.Text
+                                                allowFontScaling={false}
+                                                style={{
+                                                  fontSize: 12,
+                                                  color: '#000',
+                                                }}
+                                              >
+                                                {p}
+                                              </RN.Text>
+                                            </RN.TouchableOpacity>
+                                          )}
+                                        </>
+                                      ),
+                                    )}
+                                  </>
+                                ) : (
+                                  <></>
+                                )}
+                              </>
                             </RN.View>
                             <RN.TouchableOpacity
                               onPress={() => move(item, 'todo')}
@@ -517,7 +630,7 @@ export default function BoardScreen(props) {
                   <ButtonCard
                     disabled
                     title={modalTitle}
-                    count={countDone.length}
+                    count={done.length}
                     bgcolor="#eefae8"
                     badgecolor="#cbf0b9"
                     icon={
@@ -542,7 +655,7 @@ export default function BoardScreen(props) {
                         paddingBottom: 100,
                         gap: 20,
                       }}
-                      data={countDone}
+                      data={done}
                       renderItem={({ item }) => (
                         <RN.View
                           style={{

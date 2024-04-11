@@ -8,8 +8,7 @@ import Icons from '../../../components/Icons';
 import { useRecoilState } from 'recoil';
 import { doneAtom, progressAtom, todoAtom } from '../../../atoms/Kanban';
 import uuid from 'react-native-uuid';
-import Input from '../components/input.component';
-import SelectPriority from '../components/select-priority.component';
+import ListItem from '../components/list-item.component';
 
 const colorPriority = {
   low: '#e1fbd6',
@@ -274,93 +273,15 @@ export default function BoardScreen(props) {
                       />
                     }
                   />
-                  <RN.View
-                    style={{
-                      flex: 1,
-                      borderTopWidth: 1,
-                      borderColor: '#f1f1f1',
-                    }}
-                  >
-                    <RN.FlatList
-                      contentContainerStyle={{
-                        padding: 20,
-                        paddingBottom: 100,
-                        gap: 20,
-                      }}
-                      data={todo}
-                      renderItem={({ item }) => (
-                        <RN.View
-                          style={{
-                            borderRadius: 8,
-                            elevation: 5,
-                            backgroundColor: '#fff',
-                            padding: 20,
-                            gap: 25,
-                          }}
-                        >
-                          <RN.View
-                            style={{
-                              flexDirection: 'row',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                            }}
-                          >
-                            <RN.View
-                              style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                gap: 10,
-                              }}
-                            >
-                              <RN.TouchableOpacity
-                                onPress={() => moveToDone(item)}
-                              >
-                                <Icons
-                                  type="Fontisto"
-                                  name="checkbox-passive"
-                                  size={18}
-                                  color="#444"
-                                />
-                              </RN.TouchableOpacity>
-                              <Input
-                                val={item.title}
-                                onEndEditing={title =>
-                                  editTitle({ ...item, title })
-                                }
-                              />
-                            </RN.View>
-                            <RN.TouchableOpacity onPress={() => remove(item)}>
-                              <Icons
-                                type="FontAwesome"
-                                name="trash-o"
-                                size={18}
-                                color="#444"
-                              />
-                            </RN.TouchableOpacity>
-                          </RN.View>
-                          <RN.View
-                            style={{
-                              flexDirection: 'row',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                            }}
-                          >
-                            <SelectPriority item={item} edit={editPriority} />
-                            <RN.TouchableOpacity
-                              onPress={() => move(item, 'progress')}
-                            >
-                              <Icons
-                                type="MaterialCommunityIcons"
-                                name="progress-check"
-                                size={18}
-                                color="#444"
-                              />
-                            </RN.TouchableOpacity>
-                          </RN.View>
-                        </RN.View>
-                      )}
-                    />
-                  </RN.View>
+                  <ListItem
+                    type="todo"
+                    data={todo}
+                    remove={remove}
+                    moveToDone={moveToDone}
+                    editTitle={editTitle}
+                    editPriority={editPriority}
+                    move={move}
+                  />
                   <RN.TouchableOpacity
                     style={{
                       width: 60,
@@ -403,93 +324,15 @@ export default function BoardScreen(props) {
                       />
                     }
                   />
-                  <RN.View
-                    style={{
-                      flex: 1,
-                      borderTopWidth: 1,
-                      borderColor: '#f1f1f1',
-                    }}
-                  >
-                    <RN.FlatList
-                      contentContainerStyle={{
-                        padding: 20,
-                        paddingBottom: 100,
-                        gap: 20,
-                      }}
-                      data={progress}
-                      renderItem={({ item }) => (
-                        <RN.View
-                          style={{
-                            borderRadius: 8,
-                            elevation: 5,
-                            backgroundColor: '#fff',
-                            padding: 20,
-                            gap: 10,
-                          }}
-                        >
-                          <RN.View
-                            style={{
-                              flexDirection: 'row',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                            }}
-                          >
-                            <RN.View
-                              style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                gap: 10,
-                              }}
-                            >
-                              <RN.TouchableOpacity
-                                onPress={() => moveToDone(item)}
-                              >
-                                <Icons
-                                  type="Fontisto"
-                                  name="checkbox-passive"
-                                  size={18}
-                                  color="#444"
-                                />
-                              </RN.TouchableOpacity>
-                              <Input
-                                val={item.title}
-                                onEndEditing={title =>
-                                  editTitle({ ...item, title })
-                                }
-                              />
-                            </RN.View>
-                            <RN.TouchableOpacity onPress={() => remove(item)}>
-                              <Icons
-                                type="FontAwesome"
-                                name="trash-o"
-                                size={18}
-                                color="#444"
-                              />
-                            </RN.TouchableOpacity>
-                          </RN.View>
-                          <RN.View
-                            style={{
-                              flexDirection: 'row',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                            }}
-                          >
-                            <SelectPriority item={item} edit={editPriority} />
-                            <RN.TouchableOpacity
-                              onPress={() => move(item, 'todo')}
-                            >
-                              <Icons
-                                type="Feather"
-                                name="pause-circle"
-                                size={18}
-                                color="#5e5c5c"
-                              />
-                            </RN.TouchableOpacity>
-                          </RN.View>
-                        </RN.View>
-                      )}
-                    />
-                  </RN.View>
+                  <ListItem
+                    type="progress"
+                    data={progress}
+                    remove={remove}
+                    moveToDone={moveToDone}
+                    editTitle={editTitle}
+                    editPriority={editPriority}
+                    move={move}
+                  />
                 </>
               )}
             </>
@@ -511,96 +354,7 @@ export default function BoardScreen(props) {
                       />
                     }
                   />
-                  <RN.View
-                    style={{
-                      flex: 1,
-                      borderTopWidth: 1,
-                      borderColor: '#f1f1f1',
-                    }}
-                  >
-                    <RN.FlatList
-                      contentContainerStyle={{
-                        padding: 20,
-                        paddingBottom: 100,
-                        gap: 20,
-                      }}
-                      data={done}
-                      renderItem={({ item }) => (
-                        <RN.View
-                          style={{
-                            borderRadius: 8,
-                            elevation: 5,
-                            backgroundColor: '#fff',
-                            padding: 20,
-                            gap: 10,
-                          }}
-                        >
-                          <RN.View
-                            style={{
-                              flexDirection: 'row',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                            }}
-                          >
-                            <RN.View
-                              style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                gap: 10,
-                              }}
-                            >
-                              <Icons
-                                type="Ionicons"
-                                name="checkmark-circle"
-                                size={18}
-                                color="#58c322"
-                              />
-                              <RN.Text
-                                allowFontScaling={false}
-                                style={{
-                                  fontSize: 12,
-                                  color: '#444',
-                                }}
-                              >
-                                {item.title}
-                              </RN.Text>
-                            </RN.View>
-                            <RN.TouchableOpacity onPress={() => remove(item)}>
-                              <Icons
-                                type="FontAwesome"
-                                name="trash-o"
-                                size={18}
-                                color="#444"
-                              />
-                            </RN.TouchableOpacity>
-                          </RN.View>
-                          <RN.View
-                            style={{
-                              flexDirection: 'row',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                            }}
-                          >
-                            <RN.View
-                              style={{
-                                paddingVertical: 5,
-                                paddingHorizontal: 10,
-                                borderRadius: 100,
-                                backgroundColor: colorPriority[item.priority],
-                              }}
-                            >
-                              <RN.Text
-                                allowFontScaling={false}
-                                style={{ fontSize: 12, color: '#444' }}
-                              >
-                                {item.priority}
-                              </RN.Text>
-                            </RN.View>
-                          </RN.View>
-                        </RN.View>
-                      )}
-                    />
-                  </RN.View>
+                  <ListItem type="done" data={done} remove={remove} />
                 </>
               )}
             </>

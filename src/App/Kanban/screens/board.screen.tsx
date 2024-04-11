@@ -9,6 +9,7 @@ import { useRecoilState } from 'recoil';
 import { doneAtom, progressAtom, todoAtom } from '../../../atoms/Kanban';
 import uuid from 'react-native-uuid';
 import Input from '../components/input.component';
+import SelectPriority from '../components/select-priority.component';
 
 const colorPriority = {
   low: '#e1fbd6',
@@ -22,7 +23,6 @@ export default function BoardScreen(props) {
   const [done, setDone] = useRecoilState<any>(doneAtom);
   const [visible, setVisible] = React.useState(false);
   const [modalTitle, setModalTitle] = React.useState('');
-  const [showSelectPriority, setShowSelectPriority] = React.useState(false);
 
   React.useEffect(() => {
     (async () => {
@@ -34,10 +34,6 @@ export default function BoardScreen(props) {
       setDone(valDone ? JSON.parse(valDone) : []);
     })();
   }, []);
-
-  React.useEffect(() => {
-    setShowSelectPriority(false);
-  }, [visible]);
 
   const clean = () => {
     setTodo([]);
@@ -172,7 +168,6 @@ export default function BoardScreen(props) {
       setProgress(payload);
     }
     save(item.list, payload);
-    setShowSelectPriority(false);
   };
 
   return (
@@ -350,70 +345,7 @@ export default function BoardScreen(props) {
                               alignItems: 'center',
                             }}
                           >
-                            <RN.View
-                              style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                gap: 5,
-                              }}
-                            >
-                              <RN.TouchableOpacity
-                                onPress={() =>
-                                  setShowSelectPriority(prev => !prev)
-                                }
-                                style={{
-                                  paddingVertical: 5,
-                                  paddingHorizontal: 10,
-                                  borderRadius: 100,
-                                  backgroundColor: colorPriority[item.priority],
-                                }}
-                              >
-                                <RN.Text
-                                  allowFontScaling={false}
-                                  style={{ fontSize: 12, color: '#000' }}
-                                >
-                                  {item.priority}
-                                </RN.Text>
-                              </RN.TouchableOpacity>
-                              <>
-                                {showSelectPriority ? (
-                                  <>
-                                    {['low', 'medium', 'high'].map(
-                                      (p: Priority) => (
-                                        <>
-                                          {p !== item.priority && (
-                                            <RN.TouchableOpacity
-                                              onPress={() =>
-                                                editPriority(item, p)
-                                              }
-                                              style={{
-                                                paddingVertical: 5,
-                                                paddingHorizontal: 10,
-                                                borderRadius: 100,
-                                                backgroundColor:
-                                                  colorPriority[p],
-                                              }}
-                                            >
-                                              <RN.Text
-                                                allowFontScaling={false}
-                                                style={{
-                                                  fontSize: 12,
-                                                  color: '#000',
-                                                }}
-                                              >
-                                                {p}
-                                              </RN.Text>
-                                            </RN.TouchableOpacity>
-                                          )}
-                                        </>
-                                      ),
-                                    )}
-                                  </>
-                                ) : (
-                                  <></>
-                                )}
-                              </>
-                            </RN.View>
+                            <SelectPriority item={item} edit={editPriority} />
                             <RN.TouchableOpacity
                               onPress={() => move(item, 'progress')}
                             >
@@ -542,70 +474,7 @@ export default function BoardScreen(props) {
                               alignItems: 'center',
                             }}
                           >
-                            <RN.View
-                              style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                gap: 5,
-                              }}
-                            >
-                              <RN.TouchableOpacity
-                                onPress={() =>
-                                  setShowSelectPriority(prev => !prev)
-                                }
-                                style={{
-                                  paddingVertical: 5,
-                                  paddingHorizontal: 10,
-                                  borderRadius: 100,
-                                  backgroundColor: colorPriority[item.priority],
-                                }}
-                              >
-                                <RN.Text
-                                  allowFontScaling={false}
-                                  style={{ fontSize: 12, color: '#000' }}
-                                >
-                                  {item.priority}
-                                </RN.Text>
-                              </RN.TouchableOpacity>
-                              <>
-                                {showSelectPriority ? (
-                                  <>
-                                    {['low', 'medium', 'high'].map(
-                                      (p: Priority) => (
-                                        <>
-                                          {p !== item.priority && (
-                                            <RN.TouchableOpacity
-                                              onPress={() =>
-                                                editPriority(item, p)
-                                              }
-                                              style={{
-                                                paddingVertical: 5,
-                                                paddingHorizontal: 10,
-                                                borderRadius: 100,
-                                                backgroundColor:
-                                                  colorPriority[p],
-                                              }}
-                                            >
-                                              <RN.Text
-                                                allowFontScaling={false}
-                                                style={{
-                                                  fontSize: 12,
-                                                  color: '#000',
-                                                }}
-                                              >
-                                                {p}
-                                              </RN.Text>
-                                            </RN.TouchableOpacity>
-                                          )}
-                                        </>
-                                      ),
-                                    )}
-                                  </>
-                                ) : (
-                                  <></>
-                                )}
-                              </>
-                            </RN.View>
+                            <SelectPriority item={item} edit={editPriority} />
                             <RN.TouchableOpacity
                               onPress={() => move(item, 'todo')}
                             >
